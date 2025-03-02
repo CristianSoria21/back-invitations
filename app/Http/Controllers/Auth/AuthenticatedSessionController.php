@@ -45,9 +45,14 @@ class AuthenticatedSessionController extends Controller
 	 */
 	public function destroy(Request $request): JsonResponse
 	{
-		// Revocar el token del usuario autenticado
-		$request->user()->tokens()->delete();
-
-		return response()->json(['message' => 'Cierre de sesión exitoso.']);
+		$user = $request->user();
+		
+		if ($user) {
+			$deletedTokens = $user->tokens()->delete();
+			return response()->json(['message' => 'Cierre de sesión exitoso.', 'tokens_revocados' => $deletedTokens]);
+		}
+	
+		return response()->json(['message' => 'Usuario no autenticado.'], 401);
 	}
+	
 }
